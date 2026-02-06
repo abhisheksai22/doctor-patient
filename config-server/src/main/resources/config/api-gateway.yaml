@@ -1,0 +1,40 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: false   # we are using explicit routes
+
+      routes:
+        - id: doctor-service
+          uri: lb://doctor-service
+          predicates:
+            - Path=/doctor/**
+          filters:
+            - RewritePath=/doctor/(?<segment>.*), /doctors/${segment}
+
+        - id: patient-service
+          uri: lb://patient-service
+          predicates:
+            - Path=/patient/**
+          filters:
+            - RewritePath=/patient/(?<segment>.*), /patients/${segment}
+
+        - id: appointment-service
+          uri: lb://appointment-service
+          predicates:
+            - Path=/appointment/**
+          filters:
+            - RewritePath=/appointment/(?<segment>.*), /appointments/${segment}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

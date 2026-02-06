@@ -1,0 +1,63 @@
+version: "3.9"
+
+services:
+
+  discovery-server:
+    image: discovery-server:1.0
+    container_name: discovery-server
+    ports:
+      - "8761:8761"
+    networks:
+      - hospital-net
+
+  config-server:
+    image: config-server:1.0
+    container_name: config-server
+    ports:
+      - "8888:8888"
+    depends_on:
+      - discovery-server
+    networks:
+      - hospital-net
+
+  api-gateway:
+    image: api-gateway:1.0
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - discovery-server
+      - config-server
+    networks:
+      - hospital-net
+
+  doctor-service:
+    image: doctor-service:1.0
+    container_name: doctor-service
+    depends_on:
+      - discovery-server
+      - config-server
+    networks:
+      - hospital-net
+
+  patient-service:
+    image: patient-service:1.0
+    container_name: patient-service
+    depends_on:
+      - discovery-server
+      - config-server
+    networks:
+      - hospital-net
+
+  appointment-service:
+    image: appointment-service:1.0
+    container_name: appointment-service
+    depends_on:
+      - discovery-server
+      - config-server
+    networks:
+      - hospital-net
+
+networks:
+  hospital-net:
+    driver: bridge
